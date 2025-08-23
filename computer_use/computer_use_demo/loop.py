@@ -13,9 +13,9 @@ from anthropic import (
     Anthropic,
     AnthropicBedrock,
     AnthropicVertex,
-    APIError,
-    APIResponseValidationError,
-    APIStatusError,
+    APIError as AnthropicAPIError,
+    APIResponseValidationError as AnthropicAPIResponseValidationError,
+    APIStatusError as AnthropicAPIStatusError,
 )
 from anthropic.types.beta import (
     BetaCacheControlEphemeralParam,
@@ -112,6 +112,8 @@ async def sampling_loop(
         if provider == APIProvider.ANTHROPIC:
             client = Anthropic(api_key=api_key, max_retries=4)
             enable_prompt_caching = True
+        if provider == APIProvider.NEBIUS:
+            pass
         elif provider == APIProvider.VERTEX:
             client = AnthropicVertex()
         elif provider == APIProvider.BEDROCK:
@@ -143,22 +145,23 @@ async def sampling_loop(
         # we use raw_response to provide debug information to streamlit. Your
         # implementation may be able call the SDK directly with:
         # `response = client.messages.create(...)` instead.
-        try:
-            raw_response = client.beta.messages.with_raw_response.create(
-                max_tokens=max_tokens,
-                messages=messages,
-                model=model,
-                system=[system],
-                tools=tool_collection.to_params(),
-                betas=betas,
-                extra_body=extra_body,
-            )
-        except (APIStatusError, APIResponseValidationError) as e:
-            api_response_callback(e.request, e.response, e)
-            return messages
-        except APIError as e:
-            api_response_callback(e.request, e.body, e)
-            return messages
+        if provider.by_anthropic:
+            try:
+                raw_response = client.beta.messages.with_raw_response.create(
+                    max_tokens=max_tokens,
+                    messages=messages,
+                    model=model,
+                    system=[system],
+                    tools=tool_collection.to_params(),
+                    betas=betas,
+                    extra_body=extra_body,
+                )
+            except (AnthropicAPIStatusError, AnthropicAPIResponseValidationError) as e:
+                api_response_callback(e.request, e.response, e)
+                return messages
+            except AnthropicAPIError as e:
+                api_response_callback(e.request, e.body, e)
+                return messages
 
         api_response_callback(
             raw_response.http_response.request, raw_response.http_response, None
