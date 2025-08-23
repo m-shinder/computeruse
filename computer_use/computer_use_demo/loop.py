@@ -42,7 +42,15 @@ PROMPT_CACHING_BETA_FLAG = "prompt-caching-2024-07-31"
 class APIProvider(StrEnum):
     ANTHROPIC = "anthropic"
     BEDROCK = "bedrock"
+    NEBIUS = "nebius"
     VERTEX = "vertex"
+    @property
+    def by_anthropic(self):
+        return self in ["anthropic", "bedrock", "vertex"]
+
+    @property
+    def openai_compatible(self):
+        return self in [ "nebius" ]
 
 
 # This system prompt is optimized for the Docker environment in this repository and
