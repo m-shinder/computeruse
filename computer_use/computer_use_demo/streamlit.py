@@ -48,7 +48,7 @@ class ModelConfig:
 
 
 GEMMA_3 = ModelConfig(
-    tool_version="computer_use_20250124",
+    tool_version="computer_use_openai_manual",
     max_output_tokens=128_000,
     default_output_tokens=1024 * 16,
     has_thinking=True, ### XXX: need factcheck
