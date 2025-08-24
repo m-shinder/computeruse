@@ -28,6 +28,12 @@ from anthropic.types.beta import (
     BetaToolResultBlockParam,
     BetaToolUseBlockParam,
 )
+from openai import (
+    OpenAI,
+    APIError as OpenAIAPIError,
+    APIResponseValidationError as OpenAIAPIResponseValidationError,
+    APIStatusError as OpenAIAPIStatusError,
+)
 
 from .tools import (
     TOOL_GROUPS_BY_VERSION,
@@ -44,6 +50,7 @@ class APIProvider(StrEnum):
     BEDROCK = "bedrock"
     NEBIUS = "nebius"
     VERTEX = "vertex"
+
     @property
     def by_anthropic(self):
         return self in ["anthropic", "bedrock", "vertex"]
@@ -113,7 +120,11 @@ async def sampling_loop(
             client = Anthropic(api_key=api_key, max_retries=4)
             enable_prompt_caching = True
         if provider == APIProvider.NEBIUS:
-            pass
+            client = OpenAI(
+                    base_url="https://api.studio.nebius.com/v1",
+                    api_key=api_key,
+                    max_retries=4
+                )
         elif provider == APIProvider.VERTEX:
             client = AnthropicVertex()
         elif provider == APIProvider.BEDROCK:
@@ -160,6 +171,26 @@ async def sampling_loop(
                 api_response_callback(e.request, e.response, e)
                 return messages
             except AnthropicAPIError as e:
+                api_response_callback(e.request, e.body, e)
+                return messages
+        if provider.openai_compatible:
+            system_msg = BetaMessageParam(
+                role="system",
+                content=f"{SYSTEM_PROMPT}{' ' + system_prompt_suffix if system_prompt_suffix else ''}",
+            )
+            try:
+                raw_response = client.chat.completions.with_raw_response.create(
+                    max_tokens=max_tokens,
+                    messages=[system_msg]+messages,
+                    model=model,
+                    #tools=tool_collection.to_params(),
+                    #betas=betas,
+                    #extra_body=extra_body,
+                )
+            except (OpenAIAPIStatusError, OpenAIAPIResponseValidationError) as e:
+                api_response_callback(e.request, e.response, e)
+                return messages
+            except OpenAIAPIError as e:
                 api_response_callback(e.request, e.body, e)
                 return messages
 
