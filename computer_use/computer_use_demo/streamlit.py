@@ -127,7 +127,7 @@ def setup_state():
             APIProvider(os.getenv("API_PROVIDER", "anthropic"))
         )
     if "provider_radio" not in st.session_state:
-        st.session_state.provider_radio = st.session_state.provider
+        st.session_state.provider_radio = st.session_state.provider.value
     if "model" not in st.session_state:
         _reset_model()
     if "auth_validated" not in st.session_state:
@@ -149,9 +149,7 @@ def setup_state():
 
 
 def _reset_model():
-    st.session_state.model = PROVIDER_TO_DEFAULT_MODEL_NAME[
-        cast(APIProvider, st.session_state.provider)
-    ]
+    st.session_state.model = PROVIDER_TO_DEFAULT_MODEL_NAME[st.session_state.provider]
     _reset_model_conf()
 
 
@@ -188,9 +186,9 @@ async def main():
     with st.sidebar:
 
         def _reset_api_provider():
-            if st.session_state.provider_radio != st.session_state.provider:
+            if st.session_state.provider_radio != st.session_state.provider.value:
                 _reset_model()
-                st.session_state.provider = st.session_state.provider_radio
+                st.session_state.provider = APIProvider(st.session_state.provider_radio)
                 st.session_state.auth_validated = False
 
         provider_options = [option.value for option in APIProvider]
