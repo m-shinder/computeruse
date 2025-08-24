@@ -34,7 +34,10 @@ from openai import (
     APIResponseValidationError as OpenAIAPIResponseValidationError,
     APIStatusError as OpenAIAPIStatusError,
 )
-
+from openai.types.chat import (
+    ChatCompletion,
+    ChatCompletionMessage,
+)
 from .tools import (
     TOOL_GROUPS_BY_VERSION,
     ToolCollection,
@@ -200,7 +203,10 @@ async def sampling_loop(
 
         response = raw_response.parse()
 
-        response_params = _response_to_params(response)
+        if provider.by_anthropic:
+            response_params = _anthropic_response_to_params(response)
+        if provider.openai_compatible:
+            response_params = _openai_response_to_params(response)
         messages.append(
             {
                 "role": "assistant",
@@ -276,7 +282,7 @@ def _maybe_filter_to_n_most_recent_images(
             tool_result["content"] = new_content
 
 
-def _response_to_params(
+def _anthropic_response_to_params(
     response: BetaMessage,
 ) -> list[BetaContentBlockParam]:
     res: list[BetaContentBlockParam] = []
@@ -296,6 +302,17 @@ def _response_to_params(
         else:
             # Handle tool use blocks normally
             res.append(cast(BetaToolUseBlockParam, block.model_dump()))
+    return res
+
+
+def _openai_response_to_params(
+    response: BetaMessage,
+) -> list[BetaContentBlockParam]:
+    res: list[BetaContentBlockParam] = []
+    message = response.choices[0].message
+    # Counterpart of isinstance(block, BetaTextBlock)
+    if message.content:
+        res.append(BetaToolResultBlockParam(type="text", text=message.content))
     return res
 
 
