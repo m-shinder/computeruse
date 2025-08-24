@@ -102,7 +102,7 @@ STREAMLIT_STYLE = """
 </style>
 """
 
-WARNING_TEXT = "⚠️ Security Alert: Never provide access to sensitive accounts or data, as malicious web content can hijack Claude's behavior"
+WARNING_TEXT = "⚠️ Security Alert: Never provide access to sensitive accounts or data, as malicious web content can hijack LLM's behavior"
 INTERRUPT_TEXT = "(user stopped or interrupted and wrote the following)"
 INTERRUPT_TOOL_ERROR = "human stopped or interrupted tool execution"
 
@@ -178,7 +178,7 @@ async def main():
 
     st.markdown(STREAMLIT_STYLE, unsafe_allow_html=True)
 
-    st.title("Claude Computer Use Demo")
+    st.title("LLM Computer Use Demo")
 
     if not os.getenv("HIDE_WARNING", False):
         st.warning(WARNING_TEXT)
@@ -278,7 +278,7 @@ async def main():
 
     chat, http_logs = st.tabs(["Chat", "HTTP Exchange Logs"])
     new_message = st.chat_input(
-        "Type a message to send to Claude to control the computer..."
+        "Type a message to send to LLM to control the computer..."
     )
 
     with chat:
