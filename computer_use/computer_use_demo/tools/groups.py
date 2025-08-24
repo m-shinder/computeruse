@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from typing import Literal
 
 from .base import BaseLLMTool
-from .bash import BashTool20241022, BashTool20250124
+from .bash import GenericBashTool, BashTool20241022, BashTool20250124
 from .computer import ComputerTool20241022, ComputerTool20250124
 from .edit import EditTool20241022, EditTool20250124, EditTool20250429
 
@@ -39,7 +39,7 @@ TOOL_GROUPS: list[ToolGroup] = [
     ),
     ToolGroup(
         version="computer_use_openai_manual",
-        tools=[],
+        tools=[GenericBashTool],
     ),
 ]
 

@@ -101,16 +101,17 @@ class _BashSession:
         return CLIResult(output=output, error=error)
 
 
-class BashTool20250124(BaseLLMTool):
+class GenericBashTool(BaseLLMTool):
     """
     A tool that allows the agent to run bash commands.
-    The tool parameters are defined by Anthropic and are not editable.
+    Models provided by Antropic have predefined parameters
+    and require only api_type. Which is set in respectable classes
     """
 
     _session: _BashSession | None
 
-    api_type: Literal["bash_20250124"] = "bash_20250124"
     name: Literal["bash"] = "bash"
+    api_type: str | None = None
 
     def __init__(self):
         self._session = None
@@ -121,6 +122,29 @@ class BashTool20250124(BaseLLMTool):
             "type": self.api_type,
             "name": self.name,
         }
+
+    def to_openai_params(self) -> Any:
+        return {
+            "type": "function",
+            "function": {
+                "name": self.name,
+                "description": "Execute bash commands",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "command": {
+                            "type": "string",
+                            "description": "The bash command to execute"
+                        },
+                        "restart": {
+                            "type": "boolean",
+                            "description": "Does session need to be restarted?"
+                        }
+                    },
+                    "required": ["command"]
+                }
+        }
+    }
 
     async def __call__(
         self, command: str | None = None, restart: bool = False, **kwargs
@@ -143,5 +167,8 @@ class BashTool20250124(BaseLLMTool):
         raise ToolError("no command provided.")
 
 
-class BashTool20241022(BashTool20250124):
+class BashTool20250124(GenericBashTool):
+    api_type: Literal["bash_20250124"] = "bash_20250124"  # pyright: ignore[reportIncompatibleVariableOverride]
+
+class BashTool20241022(GenericBashTool):
     api_type: Literal["bash_20250124"] = "bash_20250124"  # pyright: ignore[reportIncompatibleVariableOverride]

@@ -24,6 +24,11 @@ class ToolCollection:
     ) -> list[BetaToolUnionParam]:
         return [tool.to_anthropic_params() for tool in self.tools]
 
+    def to_openai_params(
+        self,
+    ) -> list[BetaToolUnionParam]:
+        return [tool.to_openai_params() for tool in self.tools]
+
     async def run(self, *, name: str, tool_input: dict[str, Any]) -> ToolResult:
         tool = self.tool_map.get(name)
         if not tool:
