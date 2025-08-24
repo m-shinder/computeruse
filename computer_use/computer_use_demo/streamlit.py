@@ -34,6 +34,7 @@ from computer_use_demo.tools import ToolResult, ToolVersion
 PROVIDER_TO_DEFAULT_MODEL_NAME: dict[APIProvider, str] = {
     APIProvider.ANTHROPIC: "claude-sonnet-4-20250514",
     APIProvider.BEDROCK: "anthropic.claude-3-5-sonnet-20241022-v2:0",
+    APIProvider.NEBIUS: "google/gemma-3-27b-it",
     APIProvider.VERTEX: "claude-3-5-sonnet-v2@20241022",
 }
 
@@ -45,6 +46,13 @@ class ModelConfig:
     default_output_tokens: int
     has_thinking: bool = False
 
+
+GEMMA_3 = ModelConfig(
+    tool_version="computer_use_20250124",
+    max_output_tokens=128_000,
+    default_output_tokens=1024 * 16,
+    has_thinking=True, ### XXX: need factcheck
+)
 
 SONNET_3_5_NEW = ModelConfig(
     tool_version="computer_use_20241022",
@@ -67,6 +75,7 @@ CLAUDE_4 = ModelConfig(
 )
 
 MODEL_TO_MODEL_CONF: dict[str, ModelConfig] = {
+    "google/gemma-3-27b-it": GEMMA_3,
     "claude-3-7-sonnet-20250219": SONNET_3_7,
     "claude-opus-4@20250508": CLAUDE_4,
     "claude-sonnet-4-20250514": CLAUDE_4,
@@ -109,12 +118,13 @@ def setup_state():
         st.session_state.messages = []
     if "api_key" not in st.session_state:
         # Try to load API key from file first, then environment
-        st.session_state.api_key = load_from_storage("api_key") or os.getenv(
-            "ANTHROPIC_API_KEY", ""
-        )
+        st.session_state.api_key = load_from_storage("api_key") \
+        or os.getenv("ANTHROPIC_API_KEY") \
+        or os.getenv("NEBIUS_API_KEY") \
+        or ""
     if "provider" not in st.session_state:
         st.session_state.provider = (
-            os.getenv("API_PROVIDER", "anthropic") or APIProvider.ANTHROPIC
+            APIProvider(os.getenv("API_PROVIDER", "anthropic"))
         )
     if "provider_radio" not in st.session_state:
         st.session_state.provider_radio = st.session_state.provider
@@ -197,6 +207,14 @@ async def main():
         if st.session_state.provider == APIProvider.ANTHROPIC:
             st.text_input(
                 "Anthropic API Key",
+                type="password",
+                key="api_key",
+                on_change=lambda: save_to_storage("api_key", st.session_state.api_key),
+            )
+
+        if st.session_state.provider == APIProvider.NEBIUS:
+            st.text_input(
+                "Nebius API Key",
                 type="password",
                 key="api_key",
                 on_change=lambda: save_to_storage("api_key", st.session_state.api_key),
@@ -377,6 +395,9 @@ def validate_auth(provider: APIProvider, api_key: str | None):
 
         if not boto3.Session().get_credentials():
             return "You must have AWS credentials set up to use the Bedrock API."
+    if provider == APIProvider.NEBIUS:
+        if not api_key:
+            return "Enter your Nebius API key in the sidebar to continue"
     if provider == APIProvider.VERTEX:
         import google.auth
         from google.auth.exceptions import DefaultCredentialsError
