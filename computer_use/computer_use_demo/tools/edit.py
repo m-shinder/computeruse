@@ -2,7 +2,7 @@ from collections import defaultdict
 from pathlib import Path
 from typing import Any, Literal, get_args
 
-from .base import BaseAnthropicTool, CLIResult, ToolError, ToolResult
+from .base import BaseLLMTool, CLIResult, ToolError, ToolResult
 from .run import maybe_truncate, run
 
 Command_20250124 = Literal[
@@ -22,7 +22,7 @@ Command_20250429 = Literal[
 SNIPPET_LINES: int = 4
 
 
-class EditTool20250124(BaseAnthropicTool):
+class EditTool20250124(BaseLLMTool):
     """
     An filesystem editor tool that allows the agent to view, create, and edit files.
     The tool parameters are defined by Anthropic and are not editable.
@@ -37,7 +37,7 @@ class EditTool20250124(BaseAnthropicTool):
         self._file_history = defaultdict(list)
         super().__init__()
 
-    def to_params(self) -> Any:
+    def to_anthropic_params(self) -> Any:
         return {
             "name": self.name,
             "type": self.api_type,
@@ -295,7 +295,7 @@ class EditTool20250124(BaseAnthropicTool):
         )
 
 
-class EditTool20250429(BaseAnthropicTool):
+class EditTool20250429(BaseLLMTool):
     """
     An filesystem editor tool that allows the agent to view, create, and edit files.
     The tool parameters are defined by Anthropic and are not editable.
@@ -310,7 +310,7 @@ class EditTool20250429(BaseAnthropicTool):
         self._file_history = defaultdict(list)
         super().__init__()
 
-    def to_params(self) -> Any:
+    def to_anthropic_params(self) -> Any:
         return {
             "name": self.name,
             "type": self.api_type,

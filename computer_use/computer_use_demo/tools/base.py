@@ -5,7 +5,7 @@ from typing import Any
 from anthropic.types.beta import BetaToolUnionParam
 
 
-class BaseAnthropicTool(metaclass=ABCMeta):
+class BaseLLMTool(metaclass=ABCMeta):
     """Abstract base class for Anthropic-defined tools."""
 
     @abstractmethod
@@ -14,11 +14,10 @@ class BaseAnthropicTool(metaclass=ABCMeta):
         ...
 
     @abstractmethod
-    def to_params(
+    def to_anthropic_params(
         self,
     ) -> BetaToolUnionParam:
         raise NotImplementedError
-
 
 @dataclass(kw_only=True, frozen=True)
 class ToolResult:

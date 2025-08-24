@@ -166,7 +166,7 @@ async def sampling_loop(
                     messages=messages,
                     model=model,
                     system=[system],
-                    tools=tool_collection.to_params(),
+                    tools=tool_collection.to_anthropic_params(),
                     betas=betas,
                     extra_body=extra_body,
                 )
@@ -186,7 +186,7 @@ async def sampling_loop(
                     max_tokens=max_tokens,
                     messages=[system_msg]+messages,
                     model=model,
-                    #tools=tool_collection.to_params(),
+                    #tools=tool_collection.to_anthropic_params(),
                     #betas=betas,
                     #extra_body=extra_body,
                 )

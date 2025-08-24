@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Literal
 
-from .base import BaseAnthropicTool
+from .base import BaseLLMTool
 from .bash import BashTool20241022, BashTool20250124
 from .computer import ComputerTool20241022, ComputerTool20250124
 from .edit import EditTool20241022, EditTool20250124, EditTool20250429
@@ -17,7 +17,7 @@ BetaFlag = Literal[
 @dataclass(frozen=True, kw_only=True)
 class ToolGroup:
     version: ToolVersion
-    tools: list[type[BaseAnthropicTool]]
+    tools: list[type[BaseLLMTool]]
     beta_flag: BetaFlag | None = None
 
 

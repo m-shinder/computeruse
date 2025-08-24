@@ -5,7 +5,7 @@ from typing import Any
 from anthropic.types.beta import BetaToolUnionParam
 
 from .base import (
-    BaseAnthropicTool,
+    BaseLLMTool,
     ToolError,
     ToolFailure,
     ToolResult,
@@ -15,14 +15,14 @@ from .base import (
 class ToolCollection:
     """A collection of anthropic-defined tools."""
 
-    def __init__(self, *tools: BaseAnthropicTool):
+    def __init__(self, *tools: BaseLLMTool):
         self.tools = tools
-        self.tool_map = {tool.to_params()["name"]: tool for tool in tools}
+        self.tool_map = {tool.to_anthropic_params()["name"]: tool for tool in tools}
 
-    def to_params(
+    def to_anthropic_params(
         self,
     ) -> list[BetaToolUnionParam]:
-        return [tool.to_params() for tool in self.tools]
+        return [tool.to_anthropic_params() for tool in self.tools]
 
     async def run(self, *, name: str, tool_input: dict[str, Any]) -> ToolResult:
         tool = self.tool_map.get(name)

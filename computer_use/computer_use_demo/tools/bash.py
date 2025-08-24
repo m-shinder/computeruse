@@ -2,7 +2,7 @@ import asyncio
 import os
 from typing import Any, Literal
 
-from .base import BaseAnthropicTool, CLIResult, ToolError, ToolResult
+from .base import BaseLLMTool, CLIResult, ToolError, ToolResult
 
 
 class _BashSession:
@@ -101,7 +101,7 @@ class _BashSession:
         return CLIResult(output=output, error=error)
 
 
-class BashTool20250124(BaseAnthropicTool):
+class BashTool20250124(BaseLLMTool):
     """
     A tool that allows the agent to run bash commands.
     The tool parameters are defined by Anthropic and are not editable.
@@ -116,7 +116,7 @@ class BashTool20250124(BaseAnthropicTool):
         self._session = None
         super().__init__()
 
-    def to_params(self) -> Any:
+    def to_anthropic_params(self) -> Any:
         return {
             "type": self.api_type,
             "name": self.name,
