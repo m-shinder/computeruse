@@ -19,6 +19,12 @@ class BaseLLMTool(metaclass=ABCMeta):
     ) -> BetaToolUnionParam:
         raise NotImplementedError
 
+    @abstractmethod
+    def to_openai_params(
+        self,
+    ) -> BetaToolUnionParam:
+        raise NotImplementedError
+
 @dataclass(kw_only=True, frozen=True)
 class ToolResult:
     """Represents the result of a tool execution."""
