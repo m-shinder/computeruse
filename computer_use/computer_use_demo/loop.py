@@ -327,7 +327,8 @@ def _openai_response_to_params(
     return res
 
 def _adapt_messages_for_openai(
-        messages: list[BetaMessageParam]
+        messages: list[BetaMessageParam],
+        images_allowed: bool = False
 ) -> list[dict]:
     openai_msgs = []
     for message in messages:
@@ -349,12 +350,22 @@ def _adapt_messages_for_openai(
             if block['type'] == "tool_result":
                 tool_call_id = block['tool_use_id']
                 result = ""
-                if len(block['content']) > 0:
-                    result = block['content'][0]['text']
-                content.append({
-                    'type': 'text',
-                    'text': result,
-                })
+                if isinstance(block['content'], str):
+                    content.append({
+                        'type': 'text',
+                        'text': block['content'],
+                    })
+                if isinstance(block['content'], list):
+                    for subblock in block['content']:
+                        if subblock['type'] == "text":
+                            content.append(subblock)
+                        if subblock['type'] == "image" and images_allowed:
+                            content.append({
+                                "type": "image_url",
+                                "image_url": {
+                                    "url": "data:image/png;base64," + subblock['source']['data']
+                                }
+                            })
         openai_msgs.append({
             'role': message['role'],
             'content': content,
