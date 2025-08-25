@@ -10,6 +10,7 @@ RUN apt-get update && \
     xvfb \
     xterm \
     xdotool \
+	wmctrl \
     scrot \
     imagemagick \
     sudo \
