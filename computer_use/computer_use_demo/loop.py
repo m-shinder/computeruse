@@ -6,6 +6,7 @@ import platform
 from collections.abc import Callable
 from datetime import datetime
 from enum import StrEnum
+import json
 from typing import Any, cast
 
 import httpx
@@ -181,12 +182,17 @@ async def sampling_loop(
                 role="system",
                 content=f"{SYSTEM_PROMPT}{' ' + system_prompt_suffix if system_prompt_suffix else ''}",
             )
+            openai_msgs = _adapt_messages_for_openai(messages)
             try:
                 raw_response = client.chat.completions.with_raw_response.create(
                     max_tokens=max_tokens,
-                    messages=[system_msg]+messages,
+                    messages=[system_msg]+openai_msgs,
                     model=model,
-                    #tools=tool_collection.to_anthropic_params(),
+                    tools=tool_collection.to_openai_params(),
+                    ## This parameter needed for models uncapable of auto tool choosing
+                    ## But is redundant and interfering since disalows model for chatting
+                    ## Sadly, no vision-capable model on Nebius, support tool_choice="auto"
+                    #tool_choice={ "type": "function", "function": {"name": "bash"} },
                     #betas=betas,
                     #extra_body=extra_body,
                 )
@@ -313,8 +319,53 @@ def _openai_response_to_params(
     # Counterpart of isinstance(block, BetaTextBlock)
     if message.content:
         res.append(BetaToolResultBlockParam(type="text", text=message.content))
+    if message.tool_calls:
+        for call in message.tool_calls:
+            res.append(BetaToolUseBlockParam(
+                id=call.id,
+                name=call.function.name,
+                input=json.loads(call.function.arguments),
+                type="tool_use",
+            ))
     return res
 
+def _adapt_messages_for_openai(
+        messages: list[BetaMessageParam]
+) -> list[dict]:
+    openai_msgs = []
+    for message in messages:
+        content = []
+        tool_calls = None
+        tool_call_id = None
+        for block in message['content']:
+            print(block)
+            if block['type'] == "text":
+                content.append(block)
+            if block['type'] == "tool_use":
+                tool_calls = {
+                        "id": block['id'],
+                        "type": "function",
+                        "function": {
+                            "name": block['name'],
+                            "arguments": json.dumps(block['input'])
+                        }
+                    },
+            if block['type'] == "tool_result":
+                tool_call_id = block['tool_use_id']
+                result = ""
+                if len(block['content']) > 0:
+                    result = block['content'][0]['text']
+                content.append({
+                    'type': 'text',
+                    'text': result,
+                })
+        openai_msgs.append({
+            'role': message['role'],
+            'content': content,
+            'tool_calls': tool_calls,
+            'tool_call_id': tool_call_id,
+        })
+    return openai_msgs
 
 def _inject_prompt_caching(
     messages: list[BetaMessageParam],
