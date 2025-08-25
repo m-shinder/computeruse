@@ -35,10 +35,6 @@ from openai import (
     APIResponseValidationError as OpenAIAPIResponseValidationError,
     APIStatusError as OpenAIAPIStatusError,
 )
-from openai.types.chat import (
-    ChatCompletion,
-    ChatCompletionMessage,
-)
 from .tools import (
     TOOL_GROUPS_BY_VERSION,
     ToolCollection,
