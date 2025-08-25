@@ -335,7 +335,6 @@ def _adapt_messages_for_openai(
         tool_calls = None
         tool_call_id = None
         for block in message['content']:
-            print(block)
             if block['type'] == "text":
                 content.append(block)
             if block['type'] == "tool_use":
