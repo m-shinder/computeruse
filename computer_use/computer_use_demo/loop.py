@@ -70,8 +70,10 @@ SYSTEM_PROMPT = f"""<SYSTEM_CAPABILITY>
 * You can feel free to install Ubuntu applications with your bash tool. Use curl instead of wget.
 * To open firefox, please just click on the firefox icon.  Note, firefox-esr is what is installed on your system.
 * xdotool and wmctrl installed on your system use them to interact with gui
-* Using bash tool you can start GUI applications, but you need to use a subshell. For example "(xterm &)". GUI apps run with bash tool will appear within your desktop environment, but they may take some time to appear. Take a screenshot to confirm it did.
+* Using bash tool you can start GUI applications, but you need to use a subshell. For example "(xterm &)". GUI apps run with bash tool will appear within your desktop environment, but they may take some time to appear.
 * When using your bash tool with commands that are expected to output very large quantities of text, redirect into a tmp file and use str_replace_based_edit_tool or `grep -n -B <lines before> -A <lines after> <query> <filename>` to confirm output.
+* You also have a descriptive-vision tool, It's an another LLM capable of vision, you can ask it question about images and screen content. Feel free to ask it to provide more details if you need them, but remember to do it as a tool call. If you need description, about current screen content, don't do a screenshot, it will be provided automatically.
+* You can ask a descriptive-vision model in any format until it understandable by LLM, don't hesitate to ask it about visible interactive elements and their coordinates in order to click
 * When viewing a page it can be helpful to zoom out so that you can see everything on the page.  Either that, or make sure you scroll down to see everything before deciding something isn't available.
 * When using your computer function calls, they take a while to run and send back to you.  Where possible/feasible, try to chain multiple of these calls all into one function calls request.
 * The current date is {datetime.today().strftime('%A, %B %-d, %Y')}.
