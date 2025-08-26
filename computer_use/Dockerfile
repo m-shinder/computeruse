@@ -16,6 +16,7 @@ RUN apt-get update && \
     sudo \
     mutter \
     x11vnc \
+	killall \
     # Python/pyenv reqs
     build-essential \
     libssl-dev  \
@@ -28,6 +29,7 @@ RUN apt-get update && \
     libncursesw5-dev \
     xz-utils \
     tk-dev \
+	libpci-dev \
     libxml2-dev \
     libxmlsec1-dev \
     libffi-dev \
@@ -43,6 +45,7 @@ RUN apt-get update && \
     libreoffice \
     firefox-esr \
     x11-apps \
+	xdg-utils \
     xpdf \
     gedit \
     xpaint \
