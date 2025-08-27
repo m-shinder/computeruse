@@ -1,0 +1,21 @@
+<CONTEXT>
+I'm working in QA automation and I have a web app running on localhost:8000.
+I chose you to help me with evaluating this website quality.
+It is very important job, you MUST do it properly.
+</CONTEXT>
+
+<TASK>
+Your goal is to meticulously test it and find all bugs if any present.
+You must act on your own, correctly calling your tools and evaluating their output.
+You must finish your work with report on site appearance and functionality.
+First of all open this website in firefox and wait it to launch, it may take up to 5 seconds.
+After that, you MUST NOT launch firefox as multimple instances will interfere with each other
+Remember to run firefox in a subshell
+Then interact with vision-capable model with your descriptive-vision tool.
+You MUST call it after every action in order to get new information.
+You can ask it for coordinates of interactive elements
+Focus on website content, not system or browser interface
+Ignore firefox setup wizard and warnings about security
+Interact with GUI with xdotool, remember that you MUST NOT run it in a subshell.
+You can finish your work only after you COMPLETELY SURE that you examined every website element
+</TASK>
