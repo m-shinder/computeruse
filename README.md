@@ -10,6 +10,7 @@ sudo docker build . -t computeruse:local
 export NEBIUS_API_KEY=%your_api_key%
 export API_PROVIDER="nebius"
 sudo docker run \
+    --network=host \
     -e NEBIUS_API_KEY="$NEBIUS_API_KEY" \
     -e API_PROVIDER="$API_PROVIDER" \
     -v $HOME/.anthropic:/home/computeruse/.anthropic \
@@ -62,3 +63,15 @@ The main challenge I encountered is dealing with Nebius API, which is quite rest
 I also disliked writing description-vision tool, I don't understand why Qwen2.5-Instruct have ability to use tools and Qwen2.5-VL-Instruct don't again it looks like an API fault.
 I had some issues with message format, like message.content could be `str`, `list` or `dict` but it more of a personal distaste than real challange.
 Honestly, now I regred that I decided to write this report after doing most of the job, because I definetely can tell that at each moment of time *the current problem* is the hardest one :)
+
+# Donut Clicker buggy web app
+This intentionally buggy web app is created to test LLM's ability to test a web application in controlled environment.
+It resembles a clicker game and have 3 major bugs:
+1. Button isn't working -- the simplest possible functional bug, it's clear by page visual context that it must increase number of donuts. But it don't
+2. Black square over the game central image -- visual bug, that simulates corrupted/unloaded/improper image
+3. Typo: Donut licker -- content (visual) issue. While licker is a correct word by itself, it definetely out of place on this website
+
+![Result of LLM analysis](proof_of_success.png)
+
+By the end of the day LLM successfully identified all 3 bugs, with the prompt, provided in `prompt.txt` file. It took many attempts, mostly due to incorrect tool usage but also related to separate context of controlling and visual agents.
+To create a prompt, First I provided LLM with imaginary situation context and goal, then iteration by iteration I added new entries to the task section in order to correct model's behaviour. That's all!
