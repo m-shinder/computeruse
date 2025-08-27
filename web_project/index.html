@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Donut Clicker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+            background-color: #f0f8ff;
+            margin: 0;
+        }
+        
+        h1 {
+            color: #8b4513;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+        
+        .donut-container {
+            margin: 20px 0;
+        }
+        
+        .donut-img {
+            width: 200px;
+            height: 200px;
+            cursor: pointer;
+            transition: transform 0.1s;
+            border-radius: 50%;
+        }
+        
+        .donut-img:hover {
+            transform: scale(1.05);
+        }
+        
+        .donut-img:active {
+            transform: scale(0.95);
+        }
+        
+        .donut-count {
+            font-size: 2em;
+            color: #8b4513;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+        
+        .click-button {
+            background-color: #ff69b4;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.2em;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            margin-top: 20px;
+        }
+        
+        .click-button:hover {
+            background-color: #ff1493;
+        }
+        
+        .click-button:active {
+            transform: translateY(2px);
+        }
+
+		/*
+		   First visual bug (obstructed / corrupted image)
+		*/
+		#obstruction {
+			position: absolute;
+			background: black;
+			width: 100px;
+			height: 100px;
+			top: 150px;
+			left: 500px;
+		}
+    </style>
+</head>
+<body>
+	<!-- Second visual bug (typo) -->
+    <h1>🍩 Donut licker 🍩</h1>
+    
+    <div class="donut-container">
+        <img src="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/1f369.svg" 
+             alt="Donut" 
+             class="donut-img" 
+             id="donutImage"
+             onclick="clickDonut()">
+    </div>
+    
+    <div class="donut-count" id="donutCount">Donuts: 0</div>
+    
+    <button class="click-button" onclick="clickDonut()">Click for Donut!</button>
+	<div id="obstruction"></div>
+    
+    <script>
+        let donutCount = 0;
+        
+        function clickDonut() {
+			/// Functional bug
+            //donutCount++; 
+            document.getElementById('donutCount').textContent = 'Donuts: ' + donutCount;
+            
+            // Add a little animation effect
+            const donutImg = document.getElementById('donutImage');
+            donutImg.style.transform = 'scale(1.1) rotate(10deg)';
+            setTimeout(() => {
+                donutImg.style.transform = 'scale(1) rotate(0deg)';
+            }, 100);
+        }
+    </script>
+</body>
+</html>
